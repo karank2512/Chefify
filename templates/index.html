@@ -1,23 +1,93 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Recipe Generator</title>
-  </head>
-  <body>
-    <h1>Recipe Generator</h1>
-    <form method="POST" action="/generate_recipe">
-      <label for="ingredients">Enter ingredients (comma separated):</label>
-      <input type="text" id="ingredients" name="ingredients">
-      <button type="submit">Get Recipe</button>
-    </form>
-    <form method="POST" action="/clear_recipe">
-      <button type="submit">Clear Recipe</button>
-    </form>
-    {% if recipe %}
-      <h2>Generated Recipe</h2>
-      <pre>{{ recipe }}</pre>
-    {% endif %}
-  </body>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Chefify - Your Personal AI Chef</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Chefify</h1>
+            <p class="subtitle">Your Personal AI Chef</p>
+        </header>
+
+        <div class="main-content">
+            <div class="input-section">
+                <form id="recipe-form">
+                    <div class="form-group">
+                        <label for="ingredients">What ingredients do you have?</label>
+                        <textarea id="ingredients" name="ingredients" placeholder="Enter ingredients (comma separated)&#10;Example: chicken, rice, tomatoes" rows="3"></textarea>
+                    </div>
+
+                    <div class="preferences-section">
+                        <h3>Dietary Preferences</h3>
+                        <div class="preferences-grid">
+                            <label class="checkbox-container">
+                                <input type="checkbox" name="vegetarian" id="vegetarian">
+                                <span class="checkmark"></span>
+                                Vegetarian
+                            </label>
+                            <label class="checkbox-container">
+                                <input type="checkbox" name="vegan" id="vegan">
+                                <span class="checkmark"></span>
+                                Vegan
+                            </label>
+                            <label class="checkbox-container">
+                                <input type="checkbox" name="gluten_free" id="gluten_free">
+                                <span class="checkmark"></span>
+                                Gluten Free
+                            </label>
+                            <label class="checkbox-container">
+                                <input type="checkbox" name="dairy_free" id="dairy_free">
+                                <span class="checkmark"></span>
+                                Dairy Free
+                            </label>
+                            <label class="checkbox-container">
+                                <input type="checkbox" name="high_protein" id="high_protein">
+                                <span class="checkmark"></span>
+                                High Protein
+                            </label>
+                            <label class="checkbox-container">
+                                <input type="checkbox" name="low_carb" id="low_carb">
+                                <span class="checkmark"></span>
+                                Low Carb
+                            </label>
+                            <label class="checkbox-container">
+                                <input type="checkbox" name="keto" id="keto">
+                                <span class="checkmark"></span>
+                                Keto
+                            </label>
+                            <label class="checkbox-container">
+                                <input type="checkbox" name="paleo" id="paleo">
+                                <span class="checkmark"></span>
+                                Paleo
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="submit" class="primary-button">Generate Recipe</button>
+                        <button type="button" id="clear-button" class="secondary-button">Clear</button>
+                    </div>
+                </form>
+            </div>
+
+            <div id="loading" class="loading-spinner" style="display: none;">
+                <div class="spinner"></div>
+                <p>Creating your perfect recipe...</p>
+            </div>
+
+            <div id="recipe-output" class="recipe-output" style="display: none;">
+                <div class="recipe-content">
+                    <pre id="recipe-text"></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
 </html>

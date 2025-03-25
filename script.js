@@ -1,3 +1,19 @@
+document.addEventListener('DOMContentLoaded', () => {
+  const form = document.getElementById('recipe-form');
+  const clearButton = document.getElementById('clearButton');
+  const recipeOutput = document.getElementById('recipeOutput');
+
+  form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      generateRecipe();
+  });
+
+  clearButton.addEventListener('click', () => {
+      document.getElementById('ingredientInput').value = '';
+      recipeOutput.innerHTML = '';
+  });
+});
+
 function generateRecipe() {
     const ingredientInput = document.getElementById('ingredientInput');
     const recipeOutput = document.getElementById('recipeOutput');
