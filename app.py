@@ -1,8 +1,15 @@
 import json
+import traceback
 from flask import Flask, render_template, request, jsonify
+from flask_cors import CORS
 import basic
 
 app = Flask(__name__)
+CORS(app)
+
+# Configure static files to use relative paths
+app.static_folder = 'static'
+app.static_url_path = '/static'
 
 @app.route('/')
 def home():
@@ -10,39 +17,49 @@ def home():
 
 @app.route('/generate_recipe', methods=['POST'])
 def generate_recipe_endpoint():
-    
-    ingredients = request.form['ingredients']
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({"error": "No data provided"}), 400
 
-    ingredients_list = [ingredient.strip() for ingredient in ingredients]
+        ingredients = data.get('ingredients', '').split(',')
+        ingredients = [ingredient.strip() for ingredient in ingredients if ingredient.strip()]
+        
+        if not ingredients:
+            return jsonify({"error": "No ingredients provided"}), 400
+            
+        # Get dietary preferences
+        preferences = {
+            'vegetarian': data.get('vegetarian', False),
+            'vegan': data.get('vegan', False),
+            'gluten_free': data.get('gluten_free', False),
+            'dairy_free': data.get('dairy_free', False),
+            'high_protein': data.get('high_protein', False),
+            'low_carb': data.get('low_carb', False),
+            'keto': data.get('keto', False),
+            'paleo': data.get('paleo', False)
+        }
 
-    recipe_response = basic.get_recipe(ingredients_list)
+        recipe_text = basic.get_recipe(ingredients, preferences)
+        formatted_recipe = basic.format_recipe(recipe_text)
 
-    if isinstance(recipe_response, list):
-        for element in recipe_response:
-            if hasattr(element, 'content'):
-                recipe_text = element.content[0].text
-                break
-            elif hasattr(element, 'text'):
-                recipe_text = element.text
-                break
-            else:
-                try:
-                    element_json = json.loads(str(element))
-                except json.JSONDecodeError:
-                    print("Error parsing JSON")
-    elif hasattr(recipe_response, 'content'):
-        recipe_text = recipe_response.content[0].text
-    else:
-        print("Error: Unexpected response format.")
-        return jsonify({"error": "Unexpected response format."}), 500
-
-    formatted_recipe = basic.format_recipe(recipe_text)
-
-    return render_template('index.html', recipe=formatted_recipe)
+        return jsonify({
+            "success": True,
+            "recipe": formatted_recipe
+        })
+        
+    except Exception as e:
+        app.logger.error(f"Error generating recipe: {str(e)}")
+        app.logger.error(traceback.format_exc())
+        return jsonify({
+            "success": False,
+            "error": str(e),
+            "traceback": traceback.format_exc()
+        }), 500
 
 @app.route('/clear_recipe', methods=['POST'])
 def clear_recipe():
-    return render_template('index.html')
+    return jsonify({"success": True})
 
 if __name__ == '__main__':
     app.run(debug=True)
